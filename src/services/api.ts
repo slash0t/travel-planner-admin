@@ -136,24 +136,12 @@ export const rejectRoute = async (routeId: string) => {
 };
 
 // Reviews APIs
-export const getReviews = async (routeId?: string, page = 1, limit = 10) => {
-  const queryParams = new URLSearchParams({
-    page: (page - 1).toString(),
-    size: limit.toString(),
-    ...(routeId ? { routeId } : {})
-  });
-  
-  return apiRequest(`/reviews?${queryParams}`, {}, 'library');
+export const getReviews = async () => {
+  return apiRequest(`/admin/reviews`, {}, 'library');
 };
 
 export const deleteReview = async (reviewId: string) => {
-  return apiRequest(`/reviews/${reviewId}`, {
-    method: 'DELETE'
-  }, 'library');
-};
-
-export const deleteReviewComment = async (reviewId: string) => {
-  return apiRequest(`/reviews/${reviewId}/comment`, {
+  return apiRequest(`/routes/${reviewId}/reviews`, {
     method: 'DELETE'
   }, 'library');
 };

@@ -26,9 +26,12 @@ interface Route {
 
 interface Review {
   id: number;
-  routeTitle: string;
+  routeId: number;
+  author: Author;
   rating: number;
+  comment: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 interface PageResponse {
@@ -43,6 +46,35 @@ interface PageResponse {
   numberOfElements: number;
 }
 
+interface ReviewPageResponse {
+  content: Review[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      sorted: boolean;
+      unsorted: boolean;
+      empty: boolean;
+    };
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+  };
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  numberOfElements: number;
+  size: number;
+  number: number;
+  sort: {
+    sorted: boolean;
+    unsorted: boolean;
+    empty: boolean;
+  };
+  first: boolean;
+  empty: boolean;
+}
+
 const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [routes, setRoutes] = useState<Route[]>([]);
@@ -50,52 +82,36 @@ const DashboardPage: React.FC = () => {
   const [recentReviews, setRecentReviews] = useState<Review[]>([]);
 
   const [stats, setStats] = useState({
-    totalRoutes: routes.length + pendingRoutes.length,
+    totalRoutes: 0,
     totalReviews: 0,
-    pendingModeration: pendingRoutes.length,
+    pendingModeration: 0,
   });
 
   useEffect(() => {
     fetchData();
   }, []);
 
+  // Update stats whenever routes or pendingRoutes change
+  useEffect(() => {
+    setStats({
+      totalRoutes: routes.length + pendingRoutes.length,
+      totalReviews: recentReviews.length,
+      pendingModeration: pendingRoutes.length,
+    });
+  }, [routes, pendingRoutes]);
+
   const fetchData = async () => {
     setLoading(true);
     try {
       const routesResponse: PageResponse = await getRoutes(1, 9999999, {}, false);
-      console.log('routesResponse', routesResponse);
       setRoutes(routesResponse.content);
-      console.log('routes', routes);
 
       const perndingRoutesResponse: PageResponse = await getRoutes(1, 9999999, {}, true);
       setPendingRoutes(perndingRoutesResponse.content);
-      
-      setStats({
-        totalRoutes: routes.length + pendingRoutes.length,
-        totalReviews: 0,
-        pendingModeration: pendingRoutes.length,
-      });
 
-      // Fetch pending routes and recent reviews
-      // setPendingRoutes(Array(5).fill(0).map((_, i) => ({
-      //   id: i + 1,
-      //   title: `Новый маршрут ${i + 1}`,
-      //   description: `Описание маршрута ${i + 1}`,
-      //   author: {
-      //     id: i + 10,
-      //     username: `Пользователь ${i + 10}`,
-      //     avatarUrl: null
-      //   },
-      //   submittedAt: new Date(Date.now() - i * 86400000).toISOString(),
-      //   status: 'pending'
-      // })));
-
-      // setRecentReviews(Array(5).fill(0).map((_, i) => ({
-      //   id: i + 1,
-      //   routeTitle: `Маршрут по Карелии ${i + 1}`,
-      //   rating: Math.floor(Math.random() * 5) + 1,
-      //   createdAt: new Date(Date.now() - i * 86400000).toISOString()
-      // })));
+      const reviewsResponse: ReviewPageResponse = await getReviews();
+      console.log('reviewsResponse', reviewsResponse);
+      setRecentReviews(reviewsResponse.content);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -124,19 +140,21 @@ const DashboardPage: React.FC = () => {
         <p className="text-gray-600">Обзор контента и задач модерации</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
         <StatCard 
           title="Всего маршрутов" 
           value={stats.totalRoutes} 
           icon={<Map size={24} className="text-white" />}
           color="bg-[#484dd3]"
         />
+        {/*
         <StatCard 
           title="Всего отзывов" 
           value={stats.totalReviews} 
           icon={<MessageSquare size={24} className="text-white" />}
           color="bg-[#84ba83]"
         />
+        */}
         <StatCard 
           title="Ожидают модерации" 
           value={stats.pendingModeration} 
@@ -153,7 +171,7 @@ const DashboardPage: React.FC = () => {
         */}
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold mb-4">Маршруты на модерации</h2>
           <div className="overflow-x-auto">
@@ -182,7 +200,7 @@ const DashboardPage: React.FC = () => {
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">{route.title}</td>
                       <td className="px-4 py-3 text-sm text-gray-500">{route.author.username}</td>
                       <td className="px-4 py-3 text-sm text-gray-500">
-                        {new Date(route.submittedAt).toLocaleDateString('ru-RU')}
+                        {new Date(route.createdAt).toLocaleDateString('ru-RU')}
                       </td>
                       <td className="px-4 py-3 text-sm">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
@@ -196,6 +214,7 @@ const DashboardPage: React.FC = () => {
             </table>
           </div>
         </div>
+        {/*
         
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold mb-4">Последние отзывы</h2>
@@ -220,7 +239,7 @@ const DashboardPage: React.FC = () => {
                 ) : (
                   recentReviews.map((review) => (
                     <tr key={review.id}>
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900">{review.routeTitle}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900">{routes.find(route => route.id === review.routeId)?.title || 'Неизвестный маршрут'}</td>
                       <td className="px-4 py-3 text-sm text-gray-500">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                           {review.rating} ★
@@ -236,6 +255,8 @@ const DashboardPage: React.FC = () => {
             </table>
           </div>
         </div>
+        */}
+
       </div>
     </div>
   );

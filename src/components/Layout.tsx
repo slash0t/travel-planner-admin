@@ -46,6 +46,7 @@ const Layout: React.FC = () => {
                 <span>Маршруты</span>
               </Link>
             </li>
+            {/*
             <li>
               <Link 
                 to="/reviews" 
@@ -55,6 +56,7 @@ const Layout: React.FC = () => {
                 <span>Отзывы</span>
               </Link>
             </li>
+            */}
           </ul>
         </nav>
         

@@ -67,6 +67,7 @@ const RoutesPage: React.FC = () => {
     try {
       const response: PageResponse = await getRoutes(page - 1, 10, {}, activeTab === 'pending');
       setRoutes(response.content);
+      console.log('routes', routes);
       setTotalPages(response.totalPages);
     } catch (error) {
       console.error('Error fetching routes:', error);

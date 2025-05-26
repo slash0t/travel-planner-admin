@@ -1,17 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Trash2, AlertCircle, MessageSquare } from 'lucide-react';
-import { getReviews, deleteReview, deleteReviewComment } from '../services/api';
+import { getReviews, deleteReview } from '../services/api';
 import ConfirmDialog from '../components/ConfirmDialog';
 
+
+interface Author {
+  id: number;
+  username: string;
+  avatarUrl: string | null;
+}
+
 interface Review {
-  id: string;
-  routeId: string;
-  routeTitle: string;
-  author: string;
+  id: number;
+  routeId: number;
+  author: Author;
   rating: number;
   comment: string;
   createdAt: string;
+  updatedAt: string;
 }
+
+interface ReviewPageResponse {
+  content: Review[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      sorted: boolean;
+      unsorted: boolean;
+      empty: boolean;
+    };
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+  };
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  numberOfElements: number;
+  size: number;
+  number: number;
+  sort: {
+    sorted: boolean;
+    unsorted: boolean;
+    empty: boolean;
+  };
+  first: boolean;
+  empty: boolean;
+}
+
 
 type DeleteAction = 'full' | 'comment';
 
@@ -40,9 +77,10 @@ const ReviewsPage: React.FC = () => {
   const fetchReviews = async () => {
     setLoading(true);
     try {
-      const response = await getReviews(filters.routeId, page, 10);
-      setReviews(response.data);
-      setTotalPages(Math.ceil(response.total / 10));
+      const reviewsResponse: ReviewPageResponse = await getReviews();
+      console.log('reviewsResponse', reviewsResponse);
+      setReviews(reviewsResponse.content);
+      setTotalPages(Math.ceil(reviewsResponse.totalElements / 10));
     } catch (error) {
       console.error('Error fetching reviews:', error);
     } finally {
