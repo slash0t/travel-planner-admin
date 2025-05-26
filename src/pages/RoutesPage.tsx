@@ -67,7 +67,6 @@ const RoutesPage: React.FC = () => {
     try {
       const response: PageResponse = await getRoutes(page - 1, 10, {}, activeTab === 'pending');
       setRoutes(response.content);
-      console.log('routes', routes);
       setTotalPages(response.totalPages);
     } catch (error) {
       console.error('Error fetching routes:', error);
@@ -250,7 +249,7 @@ const RoutesPage: React.FC = () => {
         </div>
         
         {/* Search and filter */}
-        <div className="mt-4 md:mt-0 flex flex-col md:flex-row gap-2">
+        {/*<div className="mt-4 md:mt-0 flex flex-col md:flex-row gap-2">
           <form onSubmit={handleSearch} className="relative">
             <input
               type="text"
@@ -269,7 +268,7 @@ const RoutesPage: React.FC = () => {
             <Filter size={18} />
             <span>Фильтры</span>
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Tabs */}

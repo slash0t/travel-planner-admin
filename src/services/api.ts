@@ -98,19 +98,23 @@ export const logoutApi = async (refreshToken: string) => {
 // Routes APIs
 export const getRoutes = async (page = 1, limit = 10, filters = {}, pending = false) => {
   const queryParams = new URLSearchParams({
-    page: (page - 1).toString(), // Spring использует 0-based пагинацию
+    page: (page - 1).toString(),
     size: limit.toString(),
     ...Object.entries(filters).reduce((acc, [key, value]) => {
       if (value) acc[key] = String(value);
       return acc;
     }, {} as Record<string, string>)
   });
-  
+
+  var requestUrl;
   if (pending) {
-    return apiRequest(`/routes/pending?${queryParams}`, {}, 'library');
+    requestUrl = `/routes/pending?${queryParams}`;
   } else {
-    return apiRequest(`/routes?${queryParams}`, {}, 'library');
+    requestUrl = `/routes?${queryParams}`;
   }
+
+  // console.log('requestUrl', requestUrl);
+  return apiRequest(requestUrl, {}, 'library');
 };
 
 export const deleteRoute = async (routeId: string) => {

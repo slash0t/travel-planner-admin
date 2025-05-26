@@ -2,57 +2,106 @@ import React, { useEffect, useState } from 'react';
 import { Map, MessageSquare, AlertTriangle, CheckCircle } from 'lucide-react';
 import { getRoutes, getReviews } from '../services/api';
 
+interface Author {
+  id: number;
+  username: string;
+  avatarUrl: string | null;
+}
+
+interface Route {
+  id: number;
+  title: string;
+  description: string;
+  author: Author;
+  countries: string[];
+  cities: string[];
+  duration: number;
+  rating: number;
+  reviewsCount: number;
+  previewImageUrl: string;
+  tags: string[];
+  createdAt: string;
+  status?: 'pending' | 'published';
+}
+
+interface Review {
+  id: number;
+  routeTitle: string;
+  rating: number;
+  createdAt: string;
+}
+
+interface PageResponse {
+  content: Route[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    offset: number;
+  };
+  totalElements: number;
+  totalPages: number;
+  numberOfElements: number;
+}
+
 const DashboardPage: React.FC = () => {
-  const [stats, setStats] = useState({
-    totalRoutes: 0,
-    totalReviews: 0,
-    pendingModeration: 0,
-    recentlyModerated: 0
-  });
-  
   const [loading, setLoading] = useState(true);
-  const [pendingRoutes, setPendingRoutes] = useState([]);
-  const [recentReviews, setRecentReviews] = useState([]);
+  const [routes, setRoutes] = useState<Route[]>([]);
+  const [pendingRoutes, setPendingRoutes] = useState<Route[]>([]);
+  const [recentReviews, setRecentReviews] = useState<Review[]>([]);
+
+  const [stats, setStats] = useState({
+    totalRoutes: routes.length + pendingRoutes.length,
+    totalReviews: 0,
+    pendingModeration: pendingRoutes.length,
+  });
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [routesData, reviewsData] = await Promise.all([
-          getRoutes(1, 1),
-          getReviews(undefined, 1, 1)
-        ]);
-        
-        setStats({
-          totalRoutes: routesData.total,
-          totalReviews: reviewsData.total,
-          pendingModeration: Math.floor(Math.random() * 20) + 5, // Mock data
-          recentlyModerated: Math.floor(Math.random() * 50) + 10 // Mock data
-        });
-
-        // Fetch pending routes and recent reviews
-        setPendingRoutes(Array(5).fill(0).map((_, i) => ({
-          id: `route-${i + 1}`,
-          title: `Новый маршрут ${i + 1}`,
-          author: `Пользователь ${i + 10}`,
-          submittedAt: new Date(Date.now() - i * 86400000).toISOString(),
-          status: 'pending'
-        })));
-
-        setRecentReviews(Array(5).fill(0).map((_, i) => ({
-          id: `review-${i + 1}`,
-          routeTitle: `Маршрут по Карелии ${i + 1}`,
-          rating: Math.floor(Math.random() * 5) + 1,
-          createdAt: new Date(Date.now() - i * 86400000).toISOString()
-        })));
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const routesResponse: PageResponse = await getRoutes(1, 9999999, {}, false);
+      console.log('routesResponse', routesResponse);
+      setRoutes(routesResponse.content);
+      console.log('routes', routes);
+
+      const perndingRoutesResponse: PageResponse = await getRoutes(1, 9999999, {}, true);
+      setPendingRoutes(perndingRoutesResponse.content);
+      
+      setStats({
+        totalRoutes: routes.length + pendingRoutes.length,
+        totalReviews: 0,
+        pendingModeration: pendingRoutes.length,
+      });
+
+      // Fetch pending routes and recent reviews
+      // setPendingRoutes(Array(5).fill(0).map((_, i) => ({
+      //   id: i + 1,
+      //   title: `Новый маршрут ${i + 1}`,
+      //   description: `Описание маршрута ${i + 1}`,
+      //   author: {
+      //     id: i + 10,
+      //     username: `Пользователь ${i + 10}`,
+      //     avatarUrl: null
+      //   },
+      //   submittedAt: new Date(Date.now() - i * 86400000).toISOString(),
+      //   status: 'pending'
+      // })));
+
+      // setRecentReviews(Array(5).fill(0).map((_, i) => ({
+      //   id: i + 1,
+      //   routeTitle: `Маршрут по Карелии ${i + 1}`,
+      //   rating: Math.floor(Math.random() * 5) + 1,
+      //   createdAt: new Date(Date.now() - i * 86400000).toISOString()
+      // })));
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const StatCard = ({ title, value, icon, color }: { title: string, value: number, icon: React.ReactNode, color: string }) => (
     <div className={`bg-white rounded-lg shadow-md p-6 ${loading ? 'animate-pulse' : ''}`}>
@@ -75,7 +124,7 @@ const DashboardPage: React.FC = () => {
         <p className="text-gray-600">Обзор контента и задач модерации</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <StatCard 
           title="Всего маршрутов" 
           value={stats.totalRoutes} 
@@ -94,12 +143,14 @@ const DashboardPage: React.FC = () => {
           icon={<AlertTriangle size={24} className="text-white" />}
           color="bg-[#f1c021]"
         />
+        {/*
         <StatCard 
           title="Недавно модерировано" 
           value={stats.recentlyModerated} 
           icon={<CheckCircle size={24} className="text-white" />}
           color="bg-[#ea2517]"
         />
+        */}
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -129,7 +180,7 @@ const DashboardPage: React.FC = () => {
                   pendingRoutes.map((route) => (
                     <tr key={route.id}>
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">{route.title}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{route.author}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500">{route.author.username}</td>
                       <td className="px-4 py-3 text-sm text-gray-500">
                         {new Date(route.submittedAt).toLocaleDateString('ru-RU')}
                       </td>

@@ -125,7 +125,7 @@ const ReviewsPage: React.FC = () => {
         </div>
         
         {/* Search and filter */}
-        <div className="mt-4 md:mt-0 flex flex-col md:flex-row gap-2">
+        {/* <div className="mt-4 md:mt-0 flex flex-col md:flex-row gap-2">
           <form onSubmit={handleSearch} className="relative">
             <input
               type="text"
@@ -144,7 +144,7 @@ const ReviewsPage: React.FC = () => {
             <Filter size={18} />
             <span>Фильтры</span>
           </button>
-        </div>
+        </div> */}
       </div>
       
       {/* Filters panel */}
