@@ -140,7 +140,7 @@ export const getReviews = async () => {
   return apiRequest(`/admin/reviews`, {}, 'library');
 };
 
-export const deleteReview = async (reviewId: string) => {
+export const deleteReview = async (reviewId: number) => {
   return apiRequest(`/routes/${reviewId}/reviews`, {
     method: 'DELETE'
   }, 'library');

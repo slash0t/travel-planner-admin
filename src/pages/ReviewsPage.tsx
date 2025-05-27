@@ -59,7 +59,7 @@ const ReviewsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
+  const [reviewToDelete, setReviewToDelete] = useState<number>(-1);
   const [deleteAction, setDeleteAction] = useState<DeleteAction>('full');
   
   const [filters, setFilters] = useState({
@@ -110,7 +110,7 @@ const ReviewsPage: React.FC = () => {
     setShowFilters(false);
   };
 
-  const handleDeleteClick = (reviewId: string, action: DeleteAction) => {
+  const handleDeleteClick = (reviewId: number, action: DeleteAction) => {
     setReviewToDelete(reviewId);
     setDeleteAction(action);
     setShowConfirmDialog(true);
@@ -119,29 +119,20 @@ const ReviewsPage: React.FC = () => {
   const confirmDelete = async () => {
     if (reviewToDelete) {
       try {
-        if (deleteAction === 'full') {
-          await deleteReview(reviewToDelete);
-          setReviews(reviews.filter(review => review.id !== reviewToDelete));
-        } else if (deleteAction === 'comment') {
-          await deleteReviewComment(reviewToDelete);
-          setReviews(reviews.map(review => 
-            review.id === reviewToDelete 
-              ? { ...review, comment: '[Комментарий удален модератором]' } 
-              : review
-          ));
-        }
+        await deleteReview(reviewToDelete);
+        setReviews(reviews.filter(review => review.id !== reviewToDelete));
       } catch (error) {
         console.error('Error deleting review:', error);
       } finally {
         setShowConfirmDialog(false);
-        setReviewToDelete(null);
+        setReviewToDelete(-1);
       }
     }
   };
 
   const cancelDelete = () => {
     setShowConfirmDialog(false);
-    setReviewToDelete(null);
+    setReviewToDelete(-1);
   };
 
   const renderStars = (rating: number) => {
@@ -271,12 +262,9 @@ const ReviewsPage: React.FC = () => {
               <div key={review.id} className="p-6 hover:bg-gray-50">
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-3">
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900">
-                      Отзыв на маршрут: {review.routeTitle}
-                    </h3>
                     <div className="flex items-center mt-1">
                       <p className="text-sm text-gray-500 mr-4">
-                        Автор: {review.author}
+                        Автор: {review.author.username}
                       </p>
                       <p className="text-sm text-gray-500">
                         {new Date(review.createdAt).toLocaleDateString('ru-RU')}
@@ -294,12 +282,6 @@ const ReviewsPage: React.FC = () => {
                 </div>
                 
                 <div className="flex justify-end gap-2">
-                  <button
-                    onClick={() => handleDeleteClick(review.id, 'comment')}
-                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ea2517]"
-                  >
-                    Удалить текст
-                  </button>
                   <button
                     onClick={() => handleDeleteClick(review.id, 'full')}
                     className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-[#ea2517] hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ea2517]"

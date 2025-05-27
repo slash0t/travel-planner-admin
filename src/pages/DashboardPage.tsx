@@ -76,10 +76,10 @@ interface ReviewPageResponse {
 }
 
 const DashboardPage: React.FC = () => {
+  const [recentReviews, setRecentReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [routes, setRoutes] = useState<Route[]>([]);
   const [pendingRoutes, setPendingRoutes] = useState<Route[]>([]);
-  const [recentReviews, setRecentReviews] = useState<Review[]>([]);
 
   const [stats, setStats] = useState({
     totalRoutes: 0,
@@ -98,7 +98,7 @@ const DashboardPage: React.FC = () => {
       totalReviews: recentReviews.length,
       pendingModeration: pendingRoutes.length,
     });
-  }, [routes, pendingRoutes]);
+  }, [routes, pendingRoutes, recentReviews]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -140,21 +140,19 @@ const DashboardPage: React.FC = () => {
         <p className="text-gray-600">Обзор контента и задач модерации</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <StatCard 
           title="Всего маршрутов" 
           value={stats.totalRoutes} 
           icon={<Map size={24} className="text-white" />}
           color="bg-[#484dd3]"
         />
-        {/*
         <StatCard 
           title="Всего отзывов" 
           value={stats.totalReviews} 
           icon={<MessageSquare size={24} className="text-white" />}
           color="bg-[#84ba83]"
         />
-        */}
         <StatCard 
           title="Ожидают модерации" 
           value={stats.pendingModeration} 
@@ -171,7 +169,7 @@ const DashboardPage: React.FC = () => {
         */}
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold mb-4">Маршруты на модерации</h2>
           <div className="overflow-x-auto">
@@ -214,7 +212,6 @@ const DashboardPage: React.FC = () => {
             </table>
           </div>
         </div>
-        {/*
         
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold mb-4">Последние отзывы</h2>
@@ -255,7 +252,6 @@ const DashboardPage: React.FC = () => {
             </table>
           </div>
         </div>
-        */}
 
       </div>
     </div>
