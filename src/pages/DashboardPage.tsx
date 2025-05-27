@@ -148,16 +148,16 @@ const DashboardPage: React.FC = () => {
           color="bg-[#484dd3]"
         />
         <StatCard 
-          title="Всего отзывов" 
-          value={stats.totalReviews} 
-          icon={<MessageSquare size={24} className="text-white" />}
-          color="bg-[#84ba83]"
-        />
-        <StatCard 
           title="Ожидают модерации" 
           value={stats.pendingModeration} 
           icon={<AlertTriangle size={24} className="text-white" />}
           color="bg-[#f1c021]"
+        />
+        <StatCard 
+          title="Всего отзывов" 
+          value={stats.totalReviews} 
+          icon={<MessageSquare size={24} className="text-white" />}
+          color="bg-[#84ba83]"
         />
         {/*
         <StatCard 
