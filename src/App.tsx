@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import RoutesPage from './pages/RoutesPage';
 import ReviewsPage from './pages/ReviewsPage';
+import HomePage from './pages/HomePage';
 import Layout from './components/Layout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
@@ -21,16 +22,17 @@ const AppRoutes = () => {
   // Redirect to dashboard if already authenticated
   useEffect(() => {
     if (isAuthenticated && window.location.pathname === '/login') {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
   
   return (
     <Routes>
+      <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
-          <Route index element={<DashboardPage />} />
+          <Route path="dashboard" element={<DashboardPage />} />
           <Route path="routes" element={<RoutesPage />} />
           <Route path="reviews" element={<ReviewsPage />} />
         </Route>

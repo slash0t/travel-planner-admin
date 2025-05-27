@@ -22,7 +22,7 @@ const LoginPage: React.FC = () => {
     try {
       const success = await login(username, password);
       if (success) {
-        navigate('/');
+        navigate('/dashboard');
       } else {
         setError('Неверное имя пользователя или пароль');
       }

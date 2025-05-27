@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Map, List, BarChart2, LogOut } from 'lucide-react';
+import { Map, List, BarChart2, LogOut, Home } from 'lucide-react';
 
 const Layout: React.FC = () => {
   const { logout } = useAuth();
@@ -10,7 +10,7 @@ const Layout: React.FC = () => {
   
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
   
   return (
@@ -19,9 +19,12 @@ const Layout: React.FC = () => {
       <div className="w-full md:w-64 bg-black text-white flex flex-col">
         {/* Logo */}
         <div className="p-4 border-b border-gray-800">
-          <h1 className="text-2xl font-bold tracking-wider">
-            <span className="text-white">ПУТЕВОД</span>
-          </h1>
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="Путевод логотип" className="w-10 h-10" />
+            <h1 className="text-2xl font-bold tracking-wider">
+              <span className="text-white">ПУТЕВОД</span>
+            </h1>
+          </div>
           <p className="text-sm text-gray-400 mt-1">Панель администратора</p>
         </div>
         
@@ -32,6 +35,15 @@ const Layout: React.FC = () => {
               <Link 
                 to="/" 
                 className={`flex items-center p-2 rounded-md transition-colors hover:bg-gray-800 ${location.pathname === '/' ? 'bg-gray-800' : ''}`}
+              >
+                <Home size={20} className="mr-3" />
+                <span>Главная</span>
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/dashboard" 
+                className={`flex items-center p-2 rounded-md transition-colors hover:bg-gray-800 ${location.pathname === '/dashboard' ? 'bg-gray-800' : ''}`}
               >
                 <BarChart2 size={20} className="mr-3" />
                 <span>Дашборд</span>
