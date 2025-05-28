@@ -1,0 +1,57 @@
+name: pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+  
+      - name: Log in to registry
+        uses: docker/login-action@v3
+        with:
+          registry: https://ghcr.io
+          username: ${{ secrets.DEPLOY_USER }}
+          password: ${{ secrets.GH_TOKEN }}
+      - name: Check gh hash before pushing to registry
+        run: |
+          echo ${{ github.sha }}
+      - name: Build and push Docker backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ghcr.io/slash0t/putevod-admin:latest
+            ghcr.io/slash0t/putevod-admin:${{ github.sha }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+      - build_and_push
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Docker Stack Deploy
+        uses: cssnr/stack-deploy-action@v1
+        with:
+          name: putevod-admin
+          file: docker-stack.yaml
+          host: ${{ secrets.HOST }}
+          user: deploy
+          ssh_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          registry_auth: true
+          registry_host: "ghcr.io"
+          registry_user: ${{ secrets.DEPLOY_USER }}
+          registry_pass: ${{ secrets.GH_TOKEN }}

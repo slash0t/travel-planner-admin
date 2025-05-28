@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-red: #ea2517;
+  --primary-black: #000000;
+  --accent-yellow: #f1c021;
+  --secondary-green: #84ba83;
+  --secondary-blue: #484dd3;
+  --background-color: #e7e4dc;
+}
+
+@layer base {
+  html {
+    font-family: 'Noto Sans', sans-serif;
+  }
+  
+  body {
+    @apply bg-[#e7e4dc];
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
