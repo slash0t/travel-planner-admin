@@ -76,7 +76,8 @@ export const loginApi = async (username: string, password: string) => {
     refreshToken: response.refreshToken,
     user: {
       id: response.user.id,
-      username: response.user.email
+      username: response.user.email,
+      admin: response.user.admin
     }
   };
 };
@@ -141,7 +142,7 @@ export const getReviews = async () => {
 };
 
 export const deleteReview = async (reviewId: number) => {
-  return apiRequest(`/routes/${reviewId}/reviews`, {
+  return apiRequest(`/admin/reviews/${reviewId}`, {
     method: 'DELETE'
   }, 'library');
 };

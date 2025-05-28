@@ -88,6 +88,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       const response = await loginApi(username, password);
+
+      if (!response.user.admin) {
+        return false;
+      }
       
       if (response.token) {
         localStorage.setItem('token', response.token);

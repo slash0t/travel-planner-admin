@@ -42,7 +42,7 @@ const LoginPage: React.FC = () => {
           {/* Logo and header */}
           <div className="p-6 bg-black text-white text-center">
             <div className="flex justify-center items-center mb-2">
-              <Map size={28} className="text-[#ea2517] mr-2" />
+              <img src="/logo.png" alt="Путевод логотип" className="w-10 h-10" />
             </div>
             <h1 className="text-2xl font-bold tracking-wider">
               <span className="text-white">ПУТЕВОД</span>
