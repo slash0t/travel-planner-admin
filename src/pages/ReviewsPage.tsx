@@ -114,6 +114,7 @@ const ReviewsPage: React.FC = () => {
     setReviewToDelete(reviewId);
     setDeleteAction(action);
     setShowConfirmDialog(true);
+    fetchReviews();
   };
 
   const confirmDelete = async () => {
