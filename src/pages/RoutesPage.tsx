@@ -65,7 +65,7 @@ const RoutesPage: React.FC = () => {
   const fetchRoutes = async () => {
     setLoading(true);
     try {
-      const response: PageResponse = await getRoutes(page - 1, 10, {}, activeTab === 'pending');
+      const response: PageResponse = await getRoutes(page - 1, 10, filters, activeTab === 'pending');
       setRoutes(response.content);
       console.log('routes', routes);
       setTotalPages(response.totalPages);
@@ -108,7 +108,7 @@ const RoutesPage: React.FC = () => {
     if (routeToDelete) {
       try {
         await deleteRoute(routeToDelete.toString());
-        setRoutes(routes.filter(route => route.id !== routeToDelete));
+        fetchRoutes();
       } catch (error) {
         console.error('Error deleting route:', error);
       } finally {

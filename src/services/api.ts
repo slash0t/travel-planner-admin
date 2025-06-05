@@ -98,6 +98,7 @@ export const logoutApi = async (refreshToken: string) => {
 
 // Routes APIs
 export const getRoutes = async (page = 1, limit = 10, filters = {}, pending = false) => {
+  filters = {};
   const queryParams = new URLSearchParams({
     page: (page - 1).toString(),
     size: limit.toString(),
@@ -121,7 +122,7 @@ export const getRoutes = async (page = 1, limit = 10, filters = {}, pending = fa
 export const deleteRoute = async (routeId: string) => {
   return apiRequest(`/routes/${routeId}`, {
     method: 'DELETE'
-  }, 'planner');
+  }, 'library');
 };
 
 export const approveRoute = async (routeId: string) => {
